@@ -3,7 +3,7 @@ import xgboost as xgb
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
-# finnnn
+# finnn
 
 def train_svc_model(X, y, C=1.0, kernel='rbf', gamma='scale', test_size=0.2, random_state=None):
     """
