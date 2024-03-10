@@ -1,30 +1,23 @@
 import pandas as pd
-from ml_models import prepare_data_and_train_models
+from ml_models import load_models_and_predict
 
-def generate_buy_signals(data, features_columns, target_column):
+def generate_buy_signals(data, features_columns, model_paths):
     """
-    Utiliza las predicciones de los modelos entrenados para generar señales de compra.
+    Genera señales de compra basadas en las predicciones de los modelos SVC, XGBoost, y Logistic Regression.
+    Una señal de compra se genera si al menos dos de los tres modelos predicen comprar.
 
     Parameters:
-    - data (pd.DataFrame): DataFrame que contiene los datos del mercado.
-    - features_columns (list): Lista de columnas utilizadas como características para el entrenamiento.
-    - target_column (str): La columna objetivo usada para el entrenamiento.
+    - data (pd.DataFrame): El DataFrame con los nuevos datos para generar las señales.
+    - features_columns (list of str): Lista de columnas usadas como características.
+    - model_paths (dict): Diccionario con las rutas de los modelos entrenados a cargar.
 
     Returns:
-    - pd.Series: Serie con señales de compra (1 para compra, 0 para no compra).
+    - pd.Series: Serie con señales de compra, donde 1 indica una señal de compra y 0 indica no comprar.
     """
+    # Cargar modelos y obtener predicciones para el nuevo conjunto de datos
+    svc_predictions, xgb_predictions, lr_predictions = load_models_and_predict(data, features_columns, model_paths)
 
-    # Obtener las predicciones de los modelos entrenados
-    svc_predictions, xgb_predictions, lr_predictions = prepare_data_and_train_models(data, features_columns, target_column)
-
-    # Generar señales de compra basadas en la mayoría de votos de los modelos
-    # Una señal de compra se activa si al menos dos de los tres modelos sugieren comprar
+    # Calcula las señales de compra basadas en la mayoría de votos de los modelos
     buy_signals = (svc_predictions + xgb_predictions + lr_predictions) >= 2
 
     return buy_signals.astype(int)
-
-# Ejemplo de uso:
-# Asumiendo que 'data' es tu DataFrame que incluye tanto las características como el objetivo
-# features_columns = ['feature1', 'feature2', ...] # Tus columnas de características
-# target_column = 'target' # Tu columna objetivo
-# buy_signals = generate_buy_signals(data, features_columns, target_column)
