@@ -7,7 +7,7 @@ def  get_strategies() -> list:
     list: Lista de todas las estrategias posibles, cada una representada por un diccionario.
     """
     strategies = []
-    indicators = ['SMA', 'RSI', 'Bollinger Bands', 'Volume Oscillator']
+    indicators = ['svc', 'xgb', 'lr']
     n = len(indicators)
 
     # Genera todas las combinaciones posibles de indicadores
