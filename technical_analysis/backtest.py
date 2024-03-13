@@ -90,11 +90,21 @@ def backtest(data: pd.DataFrame, buy_signals: pd.DataFrame, sell_signals: pd.Dat
                                                                             stop_loss, take_profit,
                                                                             initial_margin=current_price * shares_to_operate * 0.25,
                                                                             strategy_id=strategy_number))
-            if sell_signals.iloc[i].all() and cash >= current_price * shares_to_operate * (1 + commission_per_trade):
-                cash -= current_price * shares_to_operate * (
-                            1 + commission_per_trade)  # Asumiendo un modelo de margen simplificado para cortos
-                active_operations.append(Operation("short", current_price, shares_to_operate, stop_loss, take_profit,
-                                                   initial_margin=current_price * shares_to_operate * 0.25))
+        # Iterar sobre cada estrategia en sell_signals para operaciones de venta
+        for strategy_column in sell_signals.columns:
+            # Verificar la señal de venta para la estrategia actual y abrir nuevas operaciones basadas en señales de venta
+            if sell_signals[strategy_column].iloc[i] and cash >= current_price * shares_to_operate * (
+                    1 + commission_per_trade):
+                cash -= current_price * shares_to_operate * (1 + commission_per_trade)
+        
+                # Extraer el número de estrategia desde el nombre de la columna
+                strategy_number = int(strategy_column.split('_')[1])
+        
+                # Agregar una nueva operación de venta basada en la estrategia actual
+                active_operations.append(Operation("short", current_price, shares_to_operate,
+                                                   stop_loss, take_profit,
+                                                   initial_margin=current_price * shares_to_operate * 0.25,
+                                                   strategy_id=strategy_number))
 
 
 
