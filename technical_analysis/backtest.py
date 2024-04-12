@@ -74,33 +74,62 @@ def backtest(data: pd.DataFrame, buy_signals: pd.DataFrame, sell_signals: pd.Dat
         # Ajustar margen y manejar llamadas de margen para operaciones cortas
         active_operations, cash = adjust_margin_and_handle_margin_calls(data.iloc[:i + 1], active_operations, cash,
                                                                         commission_per_trade)
+        import pandas as pd
+        from get_strategies2 import get_strategies  # Suponiendo que esta función está adecuadamente definida
 
-        # Iterar sobre cada estrategia en buy_signals
-        for strategy_column in buy_signals.columns:
-            # Verificar la señal de compra para la estrategia actual y abrir nuevas operaciones basadas en señales de compra y venta
-            if buy_signals[strategy_column].iloc[i] and cash >= current_price * shares_to_operate * (
-                    1 + commission_per_trade):
-                cash -= current_price * shares_to_operate * (1 + commission_per_trade)
+        def backtest(data, initial_cash=10000, commission_per_trade=0.001, shares_to_operate=10, stop_loss=0.01,
+                     take_profit=0.01):
+            cash = initial_cash
+            active_operations = []
+            portfolio_values = []
 
-                # Extraer el número de estrategia desde el nombre de la columna
-                #strategy_number = int(strategy_column.split('_')[1])
+            # Suponemos que get_strategies modifica los dataframes de señales
+            buy_signals, sell_signals = get_strategies(data)
 
-                # Agregar una nueva operación basada en la estrategia actual
-                active_operations.append(Operation("long", current_price, shares_to_operate,
-                                                                            stop_loss, take_profit,
-                                                                            initial_margin=current_price * shares_to_operate * 0.25))
-                                                                            #strategy_id=strategy_number))
-        # Iterar sobre cada estrategia en sell_signals para operaciones de venta
-        for strategy_column in sell_signals.columns:
-            # Verificar la señal de venta para la estrategia actual y abrir nuevas operaciones basadas en señales de venta
-            if sell_signals[strategy_column].iloc[i] and cash >= current_price * shares_to_operate * (
-                    1 + commission_per_trade):
-                cash -= current_price * shares_to_operate * (1 + commission_per_trade)
-        
-                # Extraer el número de estrategia desde el nombre de la columna
-                #strategy_number = int(strategy_column.split('_')[1])
-        
-                # Agregar una nueva operación de venta basada en la estrategia actual
+            for i in range(len(data)):
+                current_price = data['Close'].iloc[i]
+
+                # Procesar señales de compra
+                for strategy_column in buy_signals.columns:
+                    if buy_signals[strategy_column].iloc[i] and cash >= current_price * shares_to_operate * (
+                            1 + commission_per_trade):
+                        cash -= current_price * shares_to_operate * (1 + commission_per_trade)
+                        strategy_number = int(
+                            strategy_column.split('_')[1])  # Suponiendo que el nombre de columna sigue este formato
+                        active_operations.append(Operation("long", current_price, shares_to_operate,
+                                                           stop_loss, take_profit,
+                                                           current_price * shares_to_operate * 0.25,
+                                                           strategy_id=strategy_number))
+
+                # Procesar señales de venta
+                for strategy_column in sell_signals.columns:
+                    if sell_signals[strategy_column].iloc[i] and cash >= current_price * shares_to_operate * (
+                            1 + commission_per_trade):
+                        cash -= current_price * shares_to_operate * (1 + commission_per_trade)
+                        strategy_number = int(strategy_column.split('_')[1])
+                        active_operations.append(Operation("short", current_price, shares_to_operate,
+                                                           stop_loss, take_profit,
+                                                           current_price * shares_to_operate * 0.25,
+                                                           strategy_id=strategy_number))
+
+                # Actualizar el valor de la cartera
+                total_shares_value = sum(op.shares * current_price for op in active_operations if not op.closed)
+                portfolio_values.append(cash + total_shares_value)
+
+            final_portfolio_value = portfolio_values[-1]
+            total_return = (final_portfolio_value - initial_cash) / initial_cash
+            return {
+                'final_portfolio_value': final_portfolio_value,
+                'total_return': total_return,
+                'portfolio_values': portfolio_values
+            }
+
+        # Cargar los datos y ejecutar el backtest
+        data = pd.read_csv('your_data.csv')
+        results = backtest(data)
+        print(f"Retorno final: {results['total_return']:.2%}")
+
+        # Agregar una nueva operación de venta basada en la estrategia actual
                 active_operations.append(Operation("short", current_price, shares_to_operate,
                                                    stop_loss, take_profit,
                                                    initial_margin=current_price * shares_to_operate * 0.25))
