@@ -1,6 +1,6 @@
 # generate_sell_signals_2.py
 import pandas as pd
-from dl_models import load_and_predict
+from technical_analysis.dl_models import load_and_predict
 
 
 def generate_sell_signals2(data, features_columns, model_paths):

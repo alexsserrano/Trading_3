@@ -1,4 +1,4 @@
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Sequential
 from tensorflow.keras.layers import Dense
 
 # Modelo DNN

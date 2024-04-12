@@ -3,8 +3,8 @@ import optuna
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from dl_models import train_dnn_model, train_lstm_model, train_cnn_model, train_conv_lstm_model, load_and_predict
-from backtest import backtest_strategy
+from technical_analysis.dl_models import train_dnn_model, train_lstm_model, train_cnn_model, train_conv_lstm_model, load_and_predict
+from technical_analysis.backtest import backtest
 import os
 
 

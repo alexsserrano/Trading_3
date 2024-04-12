@@ -130,7 +130,7 @@ def backtest(data: pd.DataFrame, buy_signals: pd.DataFrame, sell_signals: pd.Dat
         print(f"Retorno final: {results['total_return']:.2%}")
 
         # Agregar una nueva operación de venta basada en la estrategia actual
-                active_operations.append(Operation("short", current_price, shares_to_operate,
+        active_operations.append(Operation("short", current_price, shares_to_operate,
                                                    stop_loss, take_profit,
                                                    initial_margin=current_price * shares_to_operate * 0.25))
                                                    #strategy_id=strategy_number))
