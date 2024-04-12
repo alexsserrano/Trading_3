@@ -19,6 +19,6 @@ def generate_buy_signals(data, features_columns, model_paths):
     svc_predictions, xgb_predictions, lr_predictions = load_models_and_predict(data, features_columns, model_paths)
 
     # Calcula las señales de compra basadas en la mayoría de votos de los modelos
-    buy_signals = (svc_predictions + xgb_predictions + lr_predictions) >= 2
+    buy_signals = (svc_predictions + xgb_predictions + lr_predictions+) >= 2
 
     return buy_signals.astype(int)
